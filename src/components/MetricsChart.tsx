@@ -34,30 +34,34 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) =>
   const smoothedData = useMemo(() => {
     if (smoothingFactor === 0) return data;
 
-    // Simple Moving Average
+    // Optimized Moving Average using sliding window technique
     const smoothed: LogEntry[] = [];
     const windowSize = smoothingFactor;
+
+    // Initialize running sums for each metric
+    const runningSums: Record<string, number[]> = {};
+    selectedMetrics.forEach(metric => {
+      runningSums[metric] = [];
+    });
 
     for (let i = 0; i < data.length; i++) {
       const entry = { ...data[i] };
 
       selectedMetrics.forEach(metric => {
-        let sum = 0;
-        let count = 0;
-
-        // Look back 'windowSize' steps (inclusive of current)
-        for (let j = 0; j <= windowSize; j++) {
-          if (i - j >= 0) {
-            const val = data[i - j][metric];
-            if (typeof val === 'number') {
-              sum += val;
-              count++;
-            }
+        const val = data[i][metric];
+        
+        if (typeof val === 'number') {
+          // Add current value to running sum
+          runningSums[metric].push(val);
+          
+          // Remove values outside the window
+          if (runningSums[metric].length > windowSize + 1) {
+            runningSums[metric].shift();
           }
-        }
-
-        if (count > 0) {
-          entry[metric] = sum / count;
+          
+          // Calculate average from running sum
+          const sum = runningSums[metric].reduce((acc, v) => acc + v, 0);
+          entry[metric] = sum / runningSums[metric].length;
         }
       });
 
@@ -133,7 +137,6 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) =>
           <Brush
             dataKey="step"
             height={30}
-            y={410}
             stroke="#6366f1"
             fill="#e0e7ff"
           />

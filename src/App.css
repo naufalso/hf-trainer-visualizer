@@ -53,6 +53,7 @@ body {
 }
 
 .gradient-text {
+  color: #6366f1; /* Fallback for browsers that don't support background-clip: text */
   background: var(--primary-gradient);
   -webkit-background-clip: text;
   background-clip: text;
@@ -403,6 +404,13 @@ body {
   transition: background-color 0.2s ease;
   margin-right: 12px;
   flex-shrink: 0;
+}
+
+/* Show a visible focus indicator on the toggle-switch when the hidden input is focused */
+.toggle-input:focus-visible + .toggle-switch {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
 
 .metric-toggle.active .toggle-switch {

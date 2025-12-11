@@ -60,7 +60,7 @@ const TrainingInfo: React.FC<TrainingInfoProps> = ({ trainerState }) => {
             </div>
             <div className="card-content">
               <span className="info-label">Final Epoch</span>
-              <span className="info-value">{typeof finalEpoch === 'number' ? finalEpoch.toFixed(2) : finalEpoch}</span>
+              <span className="info-value">{finalEpoch.toFixed(2)}</span>
             </div>
           </div>
         )}

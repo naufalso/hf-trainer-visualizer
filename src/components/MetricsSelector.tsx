@@ -55,8 +55,10 @@ const MetricsSelector: React.FC<MetricsSelectorProps> = ({
               checked={selectedMetrics.includes(metric)}
               onChange={() => handleToggle(metric)}
               className="toggle-input"
+              aria-label={`Toggle ${metric} metric`}
+              aria-checked={selectedMetrics.includes(metric)}
             />
-            <div className="toggle-switch">
+            <div className="toggle-switch" role="presentation">
               <div className="toggle-thumb"></div>
             </div>
             <span className="toggle-label">{metric}</span>
