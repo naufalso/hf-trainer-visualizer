@@ -10,67 +10,140 @@ import {
   ResponsiveContainer,
   Brush,
 } from 'recharts';
-import { LogEntry } from '../types';
+import { LogEntry, TrainerStateWithMetadata } from '../types';
 
 interface MetricsChartProps {
-  data: LogEntry[];
+  trainerStates: TrainerStateWithMetadata[];
   selectedMetrics: string[];
 }
 
-const COLORS = [
-  '#6366f1', // Indigo
-  '#ec4899', // Pink
-  '#10b981', // Emerald
-  '#f59e0b', // Amber
-  '#8b5cf6', // Violet
-  '#06b6d4', // Cyan
-  '#f43f5e', // Rose
-  '#84cc16', // Lime
-];
-
-const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) => {
+const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetrics }) => {
   const [smoothingFactor, setSmoothingFactor] = useState<number>(0);
 
-  const smoothedData = useMemo(() => {
-    if (smoothingFactor === 0) return data;
+  // Prepare data for comparison
+  const chartData = useMemo(() => {
+    if (trainerStates.length === 0) return [];
 
-    // Optimized Moving Average using sliding window technique
-    const smoothed: LogEntry[] = [];
-    const windowSize = smoothingFactor;
+    // For single file, return the log_history directly
+    if (trainerStates.length === 1) {
+      return trainerStates[0].data.log_history;
+    }
 
-    // Initialize running sums for each metric
-    const runningSums: Record<string, number[]> = {};
-    selectedMetrics.forEach(metric => {
-      runningSums[metric] = [];
+    // For multiple files, we need to merge the data
+    // Find all unique steps across all files
+    const allSteps = new Set<number>();
+    trainerStates.forEach(state => {
+      state.data.log_history.forEach(entry => {
+        if (entry.step !== undefined) {
+          allSteps.add(entry.step);
+        }
+      });
     });
 
-    for (let i = 0; i < data.length; i++) {
-      const entry = { ...data[i] };
+    const sortedSteps = Array.from(allSteps).sort((a, b) => a - b);
 
-      selectedMetrics.forEach(metric => {
-        const val = data[i][metric];
-
-        if (typeof val === 'number') {
-          // Add current value to running sum
-          runningSums[metric].push(val);
-
-          // Remove values outside the window
-          if (runningSums[metric].length > windowSize + 1) {
-            runningSums[metric].shift();
-          }
-
-          // Calculate average from running sum
-          const sum = runningSums[metric].reduce((acc, v) => acc + v, 0);
-          entry[metric] = sum / runningSums[metric].length;
+    // Create merged data structure
+    return sortedSteps.map(step => {
+      const dataPoint: any = { step };
+      
+      trainerStates.forEach(state => {
+        const entry = state.data.log_history.find(e => e.step === step);
+        if (entry) {
+          selectedMetrics.forEach(metric => {
+            const key = `${metric}_${state.id}`;
+            dataPoint[key] = entry[metric];
+          });
         }
       });
 
-      smoothed.push(entry);
+      return dataPoint;
+    });
+  }, [trainerStates, selectedMetrics]);
+
+  const smoothedData = useMemo(() => {
+    if (smoothingFactor === 0) return chartData;
+
+    // Apply smoothing only to single file view for simplicity
+    if (trainerStates.length === 1) {
+      const data = chartData as LogEntry[];
+      const smoothed: LogEntry[] = [];
+      const windowSize = smoothingFactor;
+      const runningSums: Record<string, number[]> = {};
+
+      selectedMetrics.forEach(metric => {
+        runningSums[metric] = [];
+      });
+
+      for (let i = 0; i < data.length; i++) {
+        const entry = { ...data[i] };
+
+        selectedMetrics.forEach(metric => {
+          const val = data[i][metric];
+
+          if (typeof val === 'number') {
+            runningSums[metric].push(val);
+
+            if (runningSums[metric].length > windowSize + 1) {
+              runningSums[metric].shift();
+            }
+
+            const sum = runningSums[metric].reduce((acc, v) => acc + v, 0);
+            entry[metric] = sum / runningSums[metric].length;
+          }
+        });
+
+        smoothed.push(entry);
+      }
+
+      return smoothed;
     }
 
-    return smoothed;
+    return chartData;
+  }, [chartData, smoothingFactor, selectedMetrics, trainerStates.length]);
 
-  }, [data, smoothingFactor, selectedMetrics]);
+  // Generate lines for the chart
+  const lines = useMemo(() => {
+    if (trainerStates.length === 1) {
+      // Single file: show each metric with its own color
+      return selectedMetrics.map((metric) => (
+        <Line
+          key={metric}
+          type="monotone"
+          dataKey={metric}
+          stroke={trainerStates[0].color}
+          strokeWidth={2.5}
+          dot={{ r: 0 }}
+          activeDot={{ r: 6, strokeWidth: 0 }}
+          connectNulls
+          animationDuration={1000}
+          name={metric}
+        />
+      ));
+    } else {
+      // Multiple files: show each metric from each file
+      const lineElements: React.ReactElement[] = [];
+      selectedMetrics.forEach((metric) => {
+        trainerStates.forEach((state) => {
+          const key = `${metric}_${state.id}`;
+          lineElements.push(
+            <Line
+              key={key}
+              type="monotone"
+              dataKey={key}
+              stroke={state.color}
+              strokeWidth={2.5}
+              dot={{ r: 0 }}
+              activeDot={{ r: 6, strokeWidth: 0 }}
+              connectNulls
+              animationDuration={1000}
+              name={`${metric} (${state.fileName})`}
+            />
+          );
+        });
+      });
+      return lineElements;
+    }
+  }, [trainerStates, selectedMetrics]);
 
   if (selectedMetrics.length === 0) {
     return (
@@ -140,19 +213,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) =>
             stroke="#6366f1"
             fill="#e0e7ff"
           />
-          {selectedMetrics.map((metric, index) => (
-            <Line
-              key={metric}
-              type="monotone"
-              dataKey={metric}
-              stroke={COLORS[index % COLORS.length]}
-              strokeWidth={2.5}
-              dot={{ r: 0 }}
-              activeDot={{ r: 6, strokeWidth: 0 }}
-              connectNulls
-              animationDuration={1000}
-            />
-          ))}
+          {lines}
         </LineChart>
       </ResponsiveContainer>
     </div>
