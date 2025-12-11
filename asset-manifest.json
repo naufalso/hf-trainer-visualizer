@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/hf-trainer-visualizer/static/css/main.82993bf0.css",
+    "main.js": "/hf-trainer-visualizer/static/js/main.55937718.js",
+    "static/js/453.b6bec53b.chunk.js": "/hf-trainer-visualizer/static/js/453.b6bec53b.chunk.js",
+    "index.html": "/hf-trainer-visualizer/index.html",
+    "main.82993bf0.css.map": "/hf-trainer-visualizer/static/css/main.82993bf0.css.map",
+    "main.55937718.js.map": "/hf-trainer-visualizer/static/js/main.55937718.js.map",
+    "453.b6bec53b.chunk.js.map": "/hf-trainer-visualizer/static/js/453.b6bec53b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.82993bf0.css",
+    "static/js/main.55937718.js"
+  ]
+}
