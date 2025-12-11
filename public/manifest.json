@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "HF Trainer Visualizer",
+  "name": "HuggingFace Trainer Visualizer",
   "icons": [
     {
       "src": "favicon.ico",

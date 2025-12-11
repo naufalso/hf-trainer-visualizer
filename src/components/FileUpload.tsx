@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { TrainerState } from '../types';
+import Toast from './Toast';
 
 interface FileUploadProps {
   onFileLoad: (data: TrainerState) => void;
@@ -7,6 +8,7 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -24,7 +26,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
         
         onFileLoad(data);
       } catch (error) {
-        alert(`Error parsing JSON file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        setError(`Error parsing JSON file: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     };
     reader.readAsText(file);
@@ -46,12 +48,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
           
           onFileLoad(data);
         } catch (error) {
-          alert(`Error parsing JSON file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setError(`Error parsing JSON file: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       };
       reader.readAsText(file);
     } else {
-      alert('Please upload a JSON file');
+      setError('Please upload a JSON file');
     }
   };
 
@@ -65,6 +67,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
+      {error && <Toast message={error} type="error" onClose={() => setError(null)} />}
       <div className="file-upload-box">
         <div className="upload-icon">📁</div>
         <h2>Upload trainer_state.json</h2>
