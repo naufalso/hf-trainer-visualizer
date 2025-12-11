@@ -44,7 +44,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
 
     // Create merged data structure
     return sortedSteps.map(step => {
-      const dataPoint: any = { step };
+      const dataPoint: Record<string, number | undefined> = { step };
       
       trainerStates.forEach(state => {
         const entry = state.data.log_history.find(e => e.step === step);

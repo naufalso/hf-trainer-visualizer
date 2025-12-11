@@ -51,22 +51,32 @@ function App() {
       color: COLORS[colorIndex],
     };
 
-    setTrainerStates((prev) => [...prev, newState]);
+    setTrainerStates((prev) => {
+      const updated = [...prev, newState];
+      
+      // Auto-select common metrics on first file only
+      if (prev.length === 0) {
+        const defaultMetrics = ['loss', 'eval_loss', 'learning_rate', 'eval_accuracy']
+          .filter((metric) => data.log_history.some((entry) => entry[metric] !== undefined));
+        setSelectedMetrics(defaultMetrics.length > 0 ? defaultMetrics : []);
+      }
+      
+      return updated;
+    });
     setShowUpload(false);
-
-    // Auto-select common metrics on first file
-    if (trainerStates.length === 0) {
-      const defaultMetrics = ['loss', 'eval_loss', 'learning_rate', 'eval_accuracy']
-        .filter((metric) => data.log_history.some((entry) => entry[metric] !== undefined));
-      setSelectedMetrics(defaultMetrics.length > 0 ? defaultMetrics : []);
-    }
   };
 
   const handleRemoveFile = (id: string) => {
-    setTrainerStates((prev) => prev.filter((state) => state.id !== id));
-    if (trainerStates.length === 1) {
-      setSelectedMetrics([]);
-    }
+    setTrainerStates((prev) => {
+      const updated = prev.filter((state) => state.id !== id);
+      
+      // Clear selected metrics if no files remain
+      if (updated.length === 0) {
+        setSelectedMetrics([]);
+      }
+      
+      return updated;
+    });
   };
 
   const handleReset = () => {
