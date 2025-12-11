@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -29,6 +29,45 @@ const COLORS = [
 ];
 
 const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) => {
+  const [smoothingFactor, setSmoothingFactor] = useState<number>(0);
+
+  const smoothedData = useMemo(() => {
+    if (smoothingFactor === 0) return data;
+
+    // Simple Moving Average
+    const smoothed: LogEntry[] = [];
+    const windowSize = smoothingFactor;
+
+    for (let i = 0; i < data.length; i++) {
+      const entry = { ...data[i] };
+
+      selectedMetrics.forEach(metric => {
+        let sum = 0;
+        let count = 0;
+
+        // Look back 'windowSize' steps (inclusive of current)
+        for (let j = 0; j <= windowSize; j++) {
+          if (i - j >= 0) {
+            const val = data[i - j][metric];
+            if (typeof val === 'number') {
+              sum += val;
+              count++;
+            }
+          }
+        }
+
+        if (count > 0) {
+          entry[metric] = sum / count;
+        }
+      });
+
+      smoothed.push(entry);
+    }
+
+    return smoothed;
+
+  }, [data, smoothingFactor, selectedMetrics]);
+
   if (selectedMetrics.length === 0) {
     return (
       <div className="no-metrics-message">
@@ -46,9 +85,22 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) =>
     <div className="metrics-chart">
       <div className="chart-header">
         <h3>Performance History</h3>
+        <div className="chart-controls">
+          <label className="smoothing-control">
+            <span>Smoothing: {smoothingFactor}</span>
+            <input
+              type="range"
+              min="0"
+              max="50"
+              value={smoothingFactor}
+              onChange={(e) => setSmoothingFactor(Number(e.target.value))}
+              className="smoothing-slider"
+            />
+          </label>
+        </div>
       </div>
       <ResponsiveContainer width="100%" height={450}>
-        <LineChart data={data} margin={{ top: 10, right: 30, left: 10, bottom: 80 }}>
+        <LineChart data={smoothedData} margin={{ top: 10, right: 30, left: 10, bottom: 80 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
           <XAxis
             dataKey="step"
