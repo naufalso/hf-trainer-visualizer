@@ -134,7 +134,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
       // Multiple files: use different colors for files and dash patterns for metrics
       const lineElements: React.ReactElement[] = [];
       selectedMetrics.forEach((metric, metricIndex) => {
-        trainerStates.forEach((state, fileIndex) => {
+        trainerStates.forEach((state) => {
           const key = `${metric}_${state.id}`;
           lineElements.push(
             <Line
