@@ -12,7 +12,7 @@ function App() {
 
   const availableMetrics = useMemo(() => {
     if (!trainerState) return [];
-    
+
     const metricsSet = new Set<string>();
     trainerState.log_history.forEach((entry) => {
       Object.keys(entry).forEach((key) => {
@@ -22,7 +22,7 @@ function App() {
         }
       });
     });
-    
+
     return Array.from(metricsSet).sort();
   }, [trainerState]);
 
@@ -42,7 +42,10 @@ function App() {
   return (
     <div className="App">
       <header className="app-header">
-        <h1>🤗 HuggingFace Trainer Visualizer</h1>
+        <h1>
+          <span className="emoji">🤗</span>{' '}
+          <span className="gradient-text">HuggingFace Trainer Visualizer</span>
+        </h1>
         <p>Upload and visualize your trainer_state.json logs</p>
       </header>
 
@@ -55,15 +58,15 @@ function App() {
               Upload New File
             </button>
           </div>
-          
+
           <TrainingInfo trainerState={trainerState} />
-          
+
           <MetricsSelector
             availableMetrics={availableMetrics}
             selectedMetrics={selectedMetrics}
             onMetricsChange={setSelectedMetrics}
           />
-          
+
           <MetricsChart
             data={trainerState.log_history}
             selectedMetrics={selectedMetrics}
