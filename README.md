@@ -23,6 +23,8 @@ Visit the live application: [https://naufalso.github.io/hf-trainer-visualizer](h
 4. Select the metrics you want to visualize
 5. Analyze your training progress with interactive charts
 
+**Don't have a trainer_state.json file?** Try the included `sample_trainer_state.json` to see how it works!
+
 ## 🛠️ Development
 
 ### Prerequisites
