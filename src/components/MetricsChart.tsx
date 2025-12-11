@@ -49,16 +49,16 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) =>
 
       selectedMetrics.forEach(metric => {
         const val = data[i][metric];
-        
+
         if (typeof val === 'number') {
           // Add current value to running sum
           runningSums[metric].push(val);
-          
+
           // Remove values outside the window
           if (runningSums[metric].length > windowSize + 1) {
             runningSums[metric].shift();
           }
-          
+
           // Calculate average from running sum
           const sum = runningSums[metric].reduce((acc, v) => acc + v, 0);
           entry[metric] = sum / runningSums[metric].length;
@@ -112,7 +112,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ data, selectedMetrics }) =>
             tickLine={false}
             tick={{ fill: '#6B7280', fontSize: 12 }}
             dy={10}
-            label={{ value: 'Training Steps', position: 'insideBottom', offset: -10, fill: '#6B7280', dy: 10 }}
+            label={{ value: 'Training Steps', position: 'insideBottom', offset: -10, fill: '#6B7280', dy: 40 }}
           />
           <YAxis
             axisLine={false}
