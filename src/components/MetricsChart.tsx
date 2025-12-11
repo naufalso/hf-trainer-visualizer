@@ -17,6 +17,16 @@ interface MetricsChartProps {
   selectedMetrics: string[];
 }
 
+// Different stroke dash patterns for better visual distinction
+const STROKE_PATTERNS = [
+  '0',           // Solid
+  '5 5',         // Dashed
+  '2 2',         // Dotted
+  '10 5',        // Long dash
+  '5 2 2 2',     // Dash-dot
+  '10 5 2 5',    // Long dash-dot
+];
+
 const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetrics }) => {
   const [smoothingFactor, setSmoothingFactor] = useState<number>(0);
 
@@ -104,14 +114,15 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
   // Generate lines for the chart
   const lines = useMemo(() => {
     if (trainerStates.length === 1) {
-      // Single file: show each metric with its own color
-      return selectedMetrics.map((metric) => (
+      // Single file: show each metric with its own color and different dash patterns
+      return selectedMetrics.map((metric, metricIndex) => (
         <Line
           key={metric}
           type="monotone"
           dataKey={metric}
           stroke={trainerStates[0].color}
           strokeWidth={2.5}
+          strokeDasharray={STROKE_PATTERNS[metricIndex % STROKE_PATTERNS.length]}
           dot={{ r: 0 }}
           activeDot={{ r: 6, strokeWidth: 0 }}
           connectNulls
@@ -120,10 +131,10 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
         />
       ));
     } else {
-      // Multiple files: show each metric from each file
+      // Multiple files: use different colors for files and dash patterns for metrics
       const lineElements: React.ReactElement[] = [];
-      selectedMetrics.forEach((metric) => {
-        trainerStates.forEach((state) => {
+      selectedMetrics.forEach((metric, metricIndex) => {
+        trainerStates.forEach((state, fileIndex) => {
           const key = `${metric}_${state.id}`;
           lineElements.push(
             <Line
@@ -132,6 +143,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
               dataKey={key}
               stroke={state.color}
               strokeWidth={2.5}
+              strokeDasharray={STROKE_PATTERNS[metricIndex % STROKE_PATTERNS.length]}
               dot={{ r: 0 }}
               activeDot={{ r: 6, strokeWidth: 0 }}
               connectNulls
