@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { TrainerState } from '../types';
 import Toast from './Toast';
+import { sanitizeTrainerState } from '../utils/dataUtils';
 
 interface FileUploadProps {
   onFileLoad: (data: TrainerState, fileName: string) => void;
@@ -25,7 +26,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
             throw new Error('Invalid trainer_state.json format: missing log_history');
           }
           
-          onFileLoad(data, file.name);
+          // Sanitize data to handle NaN and invalid values
+          const sanitizedData = sanitizeTrainerState(data);
+          onFileLoad(sanitizedData, file.name);
         } catch (error) {
           setError(`Error parsing ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -54,7 +57,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
               throw new Error('Invalid trainer_state.json format: missing log_history');
             }
             
-            onFileLoad(data, file.name);
+            // Sanitize data to handle NaN and invalid values
+            const sanitizedData = sanitizeTrainerState(data);
+            onFileLoad(sanitizedData, file.name);
           } catch (error) {
             setError(`Error parsing ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }

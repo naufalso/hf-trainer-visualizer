@@ -11,6 +11,7 @@ import {
   Brush,
 } from 'recharts';
 import { LogEntry, TrainerStateWithMetadata } from '../types';
+import { isValidNumber } from '../utils/dataUtils';
 
 interface MetricsChartProps {
   trainerStates: TrainerStateWithMetadata[];
@@ -61,7 +62,11 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
         if (entry) {
           selectedMetrics.forEach(metric => {
             const key = `${metric}_${state.id}`;
-            dataPoint[key] = entry[metric];
+            const value = entry[metric];
+            // Only include valid numbers
+            if (isValidNumber(value)) {
+              dataPoint[key] = value;
+            }
           });
         }
       });
@@ -90,7 +95,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ trainerStates, selectedMetr
         selectedMetrics.forEach(metric => {
           const val = data[i][metric];
 
-          if (typeof val === 'number') {
+          if (isValidNumber(val)) {
             runningSums[metric].push(val);
 
             if (runningSums[metric].length > windowSize + 1) {
