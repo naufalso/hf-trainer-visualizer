@@ -5,7 +5,7 @@ import { LogEntry, TrainerState } from '../types';
 /**
  * Checks if a value is a valid number (not NaN, not Infinity)
  */
-export function isValidNumber(value: any): value is number {
+export function isValidNumber(value: unknown): value is number {
   return typeof value === 'number' && !isNaN(value) && isFinite(value);
 }
 
@@ -27,6 +27,8 @@ export function sanitizeLogEntry(entry: LogEntry): LogEntry {
 
 /**
  * Sanitizes trainer state data by removing NaN and invalid values from log_history
+ * Note: best_metric defaults to null (as per TrainerState type definition) while
+ * other optional fields default to undefined when invalid
  */
 export function sanitizeTrainerState(data: TrainerState): TrainerState {
   return {
