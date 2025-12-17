@@ -28,3 +28,10 @@ export interface TrainerState {
   trial_name?: string | null;
   trial_params?: Record<string, any> | null;
 }
+
+export interface TrainerStateWithMetadata {
+  id: string;
+  fileName: string;
+  data: TrainerState;
+  color: string;
+}
