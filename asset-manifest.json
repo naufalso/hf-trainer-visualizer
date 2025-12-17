@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/hf-trainer-visualizer/static/css/main.c4949fcb.css",
-    "main.js": "/hf-trainer-visualizer/static/js/main.bd5347d5.js",
+    "main.css": "/hf-trainer-visualizer/static/css/main.bdc0bce4.css",
+    "main.js": "/hf-trainer-visualizer/static/js/main.fa0e97dd.js",
     "static/js/453.b6bec53b.chunk.js": "/hf-trainer-visualizer/static/js/453.b6bec53b.chunk.js",
     "index.html": "/hf-trainer-visualizer/index.html",
-    "main.c4949fcb.css.map": "/hf-trainer-visualizer/static/css/main.c4949fcb.css.map",
-    "main.bd5347d5.js.map": "/hf-trainer-visualizer/static/js/main.bd5347d5.js.map",
+    "main.bdc0bce4.css.map": "/hf-trainer-visualizer/static/css/main.bdc0bce4.css.map",
+    "main.fa0e97dd.js.map": "/hf-trainer-visualizer/static/js/main.fa0e97dd.js.map",
     "453.b6bec53b.chunk.js.map": "/hf-trainer-visualizer/static/js/453.b6bec53b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c4949fcb.css",
-    "static/js/main.bd5347d5.js"
+    "static/css/main.bdc0bce4.css",
+    "static/js/main.fa0e97dd.js"
   ]
 }
